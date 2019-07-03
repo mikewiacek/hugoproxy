@@ -37,7 +37,7 @@ type DSCache struct {
 	D *datastore.Client
 }
 
-// CacheCertificate is how we cache certificates and letsencrypt keys in GCP Cloud Datastore.
+// CachedCertificate is how we cache certificates and letsencrypt keys in GCP Cloud Datastore.
 type CachedCertificate struct {
 	Certificate []byte `datastore:",noindex"`
 }
@@ -95,7 +95,7 @@ func (d *DSCache) Delete(ctx context.Context, name string) error {
 func goSecure(w http.ResponseWriter, r *http.Request) {
 	r.URL.Scheme = "https"
 	r.URL.Host = r.Host
-	http.Redirect(w, r, r.URL.String(), 301)
+	http.Redirect(w, r, r.URL.String(), http.StatusMovedPermanently)
 }
 
 // Taken from: golang.org/src/net/http/httputil/reverseproxy.go
