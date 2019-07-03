@@ -161,9 +161,8 @@ func NewSingleHostReverseProxy(target *url.URL) *httputil.ReverseProxy {
 		req.Header.Set("X-Original-Host", req.Host)
 		req.Host = target.Host
 	}
-	rp := &httputil.ReverseProxy{Director: director}
-	rp.Transport = &transport{http.DefaultTransport}
-	return rp
+
+	return &httputil.ReverseProxy{Director: director, Transport: &transport{http.DefaultTransport}}
 }
 
 func main() {
