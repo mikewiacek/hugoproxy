@@ -22,6 +22,7 @@ import (
 	"cloud.google.com/go/compute/metadata"
 	"cloud.google.com/go/datastore"
 	log "github.com/golang/glog"
+	"github.com/gorilla/handlers"
 	"github.com/mikewiacek/flags"
 	"golang.org/x/crypto/acme/autocert"
 )
@@ -31,6 +32,13 @@ var (
 	hostnames  = flags.StringSlice("blog_hostnames", []string{}, "CSV of hostnames for which to get certificates")
 	hugoBucket = flag.String("gcs_bucket", "", "name of the GCS bucket storing our site")
 )
+
+type logger struct{}
+
+func (l *logger) Write(buf []byte) (int, error) {
+	log.Infof("%s", buf)
+	return len(buf), nil
+}
 
 // DSCache implements autocert.Cache against GCP Cloud Datastore.
 type DSCache struct {
@@ -190,6 +198,7 @@ func main() {
 	}
 	log.Infof("Actual site serving from: %s", hugoURL)
 
+	requestLogger := &logger{}
 	m := &autocert.Manager{
 		Cache:      &DSCache{dsClient},
 		Prompt:     autocert.AcceptTOS,
@@ -198,7 +207,7 @@ func main() {
 	s := &http.Server{
 		Addr:      ":https",
 		TLSConfig: m.TLSConfig(),
-		Handler:   NewSingleHostReverseProxy(hugoURL),
+		Handler:   handlers.CombinedLoggingHandler(requestLogger, NewSingleHostReverseProxy(hugoURL)),
 	}
 
 	// Redirect http requests to https...
