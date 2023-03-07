@@ -8,5 +8,5 @@ require (
 	github.com/golang/glog v0.0.0-20210429001901-424d2337a529
 	github.com/gorilla/handlers v1.5.1
 	github.com/mikewiacek/flags v0.0.0-20190603023329-1be21e8282ef
-	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97
+	golang.org/x/crypto v0.1.0
 )
